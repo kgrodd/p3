@@ -10,6 +10,7 @@ PROGS = xx
 
 all: $(PROGS)
 
+
 compile:src/*/*.java
 	$(JAVAC) -cp $(CLASSPATH) -d bin src/*/*.java
 
