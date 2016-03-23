@@ -20,4 +20,5 @@ xx : compile
 	
 clean: 
 	rm bin/*/*.class
+	rm *.minibase
 
