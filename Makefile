@@ -10,11 +10,14 @@ PROGS = xx
 
 all: $(PROGS)
 
-
 compile:src/*/*.java
 	$(JAVAC) -cp $(CLASSPATH) -d bin src/*/*.java
 
 xx : compile
 	$(JAVA) -cp $(CLASSPATH):bin tests.ROTest
 	$(JAVA) -cp $(CLASSPATH):bin tests.QEPTest src/tests/SampleData
+
+	
+clean: 
+	rm bin/*/*.class
 
