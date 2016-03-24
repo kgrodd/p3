@@ -5,12 +5,16 @@ package relop;
  * relational algebra, this operator does NOT eliminate duplicate tuples.
  */
 public class Projection extends Iterator {
-
+	private Iterator iter;
+	private Integer[] fields;
+	private Tuple currTuple = null;
+	int depth;
   /**
    * Constructs a projection, given the underlying iterator and field numbers.
    */
   public Projection(Iterator iter, Integer... fields) {
-    throw new UnsupportedOperationException("Not implemented");
+    this.iter=iter;
+    this.fields=fields;
   }
 
   /**
@@ -25,21 +29,23 @@ public class Projection extends Iterator {
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
-    throw new UnsupportedOperationException("Not implemented");
+    iter.restart();
   }
 
   /**
    * Returns true if the iterator is open; false otherwise.
    */
   public boolean isOpen() {
-    throw new UnsupportedOperationException("Not implemented");
+    if (iter.isOpen())
+		return true;
+	return false;
   }
 
   /**
    * Closes the iterator, releasing any resources (i.e. pinned pages).
    */
   public void close() {
-    throw new UnsupportedOperationException("Not implemented");
+	this.iter.close();
   }
 
   /**

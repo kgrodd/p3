@@ -25,10 +25,8 @@ public class Selection extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-    if(hasNext()){
-    	System.out.println("Selection- Depth: " + depth);
-    	explain(depth + 1);
-    }
+    System.out.println("Selection- Depth: " + depth);
+    iter.explain(depth + 1);
   }
 
   /**
@@ -65,10 +63,11 @@ public class Selection extends Iterator {
     else{
     	currTuple = iter.getNext();
     	for(int i = 0; i < preds.length; i++){
-    		if(preds[i].evaluate(currTuple))
-    			return true;
+    		if(!preds[i].evaluate(currTuple))
+    			return hasNext();
+    		
     	}
-    	return hasNext();
+    	return true;
     }
   }
 
@@ -78,7 +77,7 @@ public class Selection extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    return currTuple;
+	return currTuple;
   }
 
 } // public class Selection extends Iterator
