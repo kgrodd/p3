@@ -19,7 +19,7 @@ public class FileScan extends Iterator {
   public FileScan(Schema schema, HeapFile file) {
     this.schema = schema;
 	this.hf = file;
-	this.hs = this.hf.openscan;
+	this.hs = this.hf.openscan();
   }
 
   /**
