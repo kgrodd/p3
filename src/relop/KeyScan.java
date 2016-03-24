@@ -12,7 +12,8 @@ public class KeyScan extends Iterator {
 	private HeapFile hf;
 	private HashIndex hi;
 	private SearchKey key;
-	
+	private HashScan hs;
+
   /**
    * Constructs an index scan, given the hash index and schema.
    */
@@ -21,6 +22,7 @@ public class KeyScan extends Iterator {
 	this.hf = file;
 	this.hi = index;
 	this.key = key;
+	this.hs = this.hi.openscan(this.key);
   }
 
   /**
@@ -28,21 +30,25 @@ public class KeyScan extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-	System.out.println("KeyScan! depth: " + depth);
+	this.indent(depth);
+	System.out.println("KeyScan!");
   }
 
   /**
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
-    throw new UnsupportedOperationException("Not implemented");
+    if(this.isOpen()){
+		this.close();
+	}
+	this.hs = this.hi.openscan(this.key);
   }
 
   /**
    * Returns true if the iterator is open; false otherwise.
    */
   public boolean isOpen() {
-    throw new UnsupportedOperationException("Not implemented");
+    return (this.hi != null ? true : false);
   }
 
   /**

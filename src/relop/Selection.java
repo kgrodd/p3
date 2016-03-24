@@ -25,10 +25,8 @@ public class Selection extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-    if(hasNext()){
     	System.out.println("Selection- Depth: " + depth);
     	explain(depth + 1);
-    }
   }
 
   /**
