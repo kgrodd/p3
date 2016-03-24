@@ -3,7 +3,7 @@ package relop;
 import global.SearchKey;
 import heap.HeapFile;
 import index.HashIndex;
-import heap.HashScan;
+import index.HashScan;
 /**
  * Wrapper for hash scan, an index access method.
  */
