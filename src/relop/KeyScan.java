@@ -3,7 +3,7 @@ package relop;
 import global.SearchKey;
 import heap.HeapFile;
 import index.HashIndex;
-
+import heap.HashScan;
 /**
  * Wrapper for hash scan, an index access method.
  */
@@ -22,7 +22,7 @@ public class KeyScan extends Iterator {
 	this.hf = file;
 	this.hi = index;
 	this.key = key;
-	this.hs = this.hi.openscan(this.key);
+	this.hs = this.hi.openScan(this.key);
   }
 
   /**
@@ -41,7 +41,7 @@ public class KeyScan extends Iterator {
     if(this.isOpen()){
 		this.close();
 	}
-	this.hs = this.hi.openscan(this.key);
+	this.hs = this.hi.openScan(this.key);
   }
 
   /**
