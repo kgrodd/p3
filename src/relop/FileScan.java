@@ -29,7 +29,7 @@ public class FileScan extends Iterator {
    */
   public void explain(int depth) {
 	this.indent(depth);
-    System.out.println("FileScan Iterator!);
+    System.out.println("FileScan Iterator!");
   }
 
   /**
