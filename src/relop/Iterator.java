@@ -11,7 +11,7 @@ package relop;
 public abstract class Iterator {
 
   /** Schema for resulting tuples; must be set in all subclass constructors. */
-  protected Schema schema;
+  private Schema schema;
 
   // --------------------------------------------------------------------------
 
