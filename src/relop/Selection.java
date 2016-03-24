@@ -1,17 +1,22 @@
 package relop;
 
+
 /**
  * The selection operator specifies which tuples to retain under a condition; in
  * Minibase, this condition is simply a set of independent predicates logically
  * connected by OR operators.
  */
 public class Selection extends Iterator {
+	private Iterator iter;
+	private Predicate[] preds;
+	private Tuple nextTuple = null;
 
   /**
    * Constructs a selection, given the underlying iterator and predicates.
    */
   public Selection(Iterator iter, Predicate... preds) {
-    throw new UnsupportedOperationException("Not implemented");
+    this.iter=iter;
+    this.preds=preds;
   }
 
   /**
@@ -26,28 +31,30 @@ public class Selection extends Iterator {
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
-    throw new UnsupportedOperationException("Not implemented");
+	iter.restart();
   }
 
   /**
    * Returns true if the iterator is open; false otherwise.
    */
   public boolean isOpen() {
-    throw new UnsupportedOperationException("Not implemented");
+	if (iter.isOpen())
+		return true;
+	return false;
   }
 
   /**
    * Closes the iterator, releasing any resources (i.e. pinned pages).
    */
   public void close() {
-    throw new UnsupportedOperationException("Not implemented");
+	this.iter.close();
   }
 
   /**
    * Returns true if there are more tuples, false otherwise.
    */
   public boolean hasNext() {
-    throw new UnsupportedOperationException("Not implemented");
+    return true;
   }
 
   /**

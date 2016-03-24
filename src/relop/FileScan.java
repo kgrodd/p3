@@ -2,6 +2,7 @@ package relop;
 
 import global.RID;
 import heap.HeapFile;
+import heap.HeapScan;
 
 /**
  * Wrapper for heap file scan, the most basic access method. This "iterator"
@@ -11,7 +12,7 @@ public class FileScan extends Iterator {
 	private HeapFile hf = null;
 	private HeapScan hs = null;
 	private RID currRID = null;
-	private TUPLE currTuple = null;
+	private Tuple currTuple = null;
 
   /**
    * Constructs a file scan, given the schema and heap file.
@@ -19,7 +20,7 @@ public class FileScan extends Iterator {
   public FileScan(Schema schema, HeapFile file) {
     this.schema = schema;
 	this.hf = file;
-	this.hs = this.hf.openscan();
+	this.hs = this.hf.openScan();
   }
 
   /**
@@ -37,14 +38,15 @@ public class FileScan extends Iterator {
 	if(this.isOpen()) {
 		this.close();
 	}
-    this.hs = this.hf.openscan();
+    this.hs = this.hf.openScan();
   }
 
   /**
    * Returns true if the iterator is open; false otherwise.
    */
   public boolean isOpen() {
-    return (this.hs ? true : false);
+    //return (this.hs ? true : false);
+    return true;
   }
 
   /**
