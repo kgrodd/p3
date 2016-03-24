@@ -63,10 +63,11 @@ public class Selection extends Iterator {
     else{
     	currTuple = iter.getNext();
     	for(int i = 0; i < preds.length; i++){
-    		if(preds[i].evaluate(currTuple))
-    			return true;
+    		if(!preds[i].evaluate(currTuple))
+    			return hasNext();
+    		
     	}
-    	return hasNext();
+    	return true;
     }
   }
 
@@ -76,7 +77,7 @@ public class Selection extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    return currTuple;
+	return currTuple;
   }
 
 } // public class Selection extends Iterator
