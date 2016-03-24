@@ -8,12 +8,17 @@ import index.HashIndex;
  * Wrapper for bucket scan, an index access method.
  */
 public class IndexScan extends Iterator {
+	private HeapFile hf;
+	private HashIndex hi;
+
 
   /**
    * Constructs an index scan, given the hash index and schema.
    */
   public IndexScan(Schema schema, HashIndex index, HeapFile file) {
-    throw new UnsupportedOperationException("Not implemented");
+  	this.schema = schema;
+	this.hf = file;
+	this.hi = index;
   }
 
   /**
@@ -21,7 +26,7 @@ public class IndexScan extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-    throw new UnsupportedOperationException("Not implemented");
+	System.out.println("IndexScan! depth: " + depth);
   }
 
   /**
