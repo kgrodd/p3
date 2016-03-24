@@ -9,7 +9,9 @@ package relop;
 public class Selection extends Iterator {
 	private Iterator iter;
 	private Predicate[] preds;
-	private Tuple nextTuple = null;
+	private Tuple currTuple = null;
+	int pos;
+	int depth;
 
   /**
    * Constructs a selection, given the underlying iterator and predicates.
@@ -17,6 +19,7 @@ public class Selection extends Iterator {
   public Selection(Iterator iter, Predicate... preds) {
     this.iter=iter;
     this.preds=preds;
+    this.pos=0;
   }
 
   /**
@@ -31,6 +34,7 @@ public class Selection extends Iterator {
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
+  	pos=0;
 	iter.restart();
   }
 
@@ -54,7 +58,17 @@ public class Selection extends Iterator {
    * Returns true if there are more tuples, false otherwise.
    */
   public boolean hasNext() {
-    return true;
+  	if(!iter.hasNext())
+  		return false;
+  
+    else{
+    	currTuple = iter.getNext();
+    	increment();
+    	if(preds[pos].evaluate(currTuple))
+    		return true;
+    	else
+    		return hasNext();
+    }
   }
 
   /**
@@ -63,7 +77,23 @@ public class Selection extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    throw new UnsupportedOperationException("Not implemented");
+  	if(!hasNext())
+		throw new IllegalStateException("No more Tuples");
+  
+    else{
+    	currTuple = iter.getNext();
+    	increment();
+    	if(preds[pos].evaluate(currTuple))
+    		return currTuple;
+    	else
+    		return getNext();
+    }
+  }
+  
+  public void increment(){
+  	if(pos != 0){
+  		pos++;
+  	}
   }
 
 } // public class Selection extends Iterator

@@ -45,8 +45,7 @@ public class FileScan extends Iterator {
    * Returns true if the iterator is open; false otherwise.
    */
   public boolean isOpen() {
-    //return (this.hs ? true : false);
-    return true;
+    return (this.hs != null ? true : false);
   }
 
   /**
