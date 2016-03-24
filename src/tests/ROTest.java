@@ -1,6 +1,6 @@
 package tests;
 
-import global.AttrOperator;
+//import global.AttrOperator;
 import global.AttrType;
 import global.RID;
 import global.SearchKey;

@@ -1,5 +1,8 @@
 package relop;
 
+/**
+ * Hash join: references on 462-463
+ */
 public class HashJoin extends Iterator {
 	private Iterator outer;
 	private Iterator inner;
@@ -22,7 +25,7 @@ public class HashJoin extends Iterator {
 
 		this.outer = left;
 		this.inner = right;
-		//this.preds = preds;
+
 		this.schema = Schema.join(left.schema, right.schema);
 		
 		nextTupleIsConsumed = true;
