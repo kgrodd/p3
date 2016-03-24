@@ -9,11 +9,18 @@ import index.HashIndex;
  */
 public class KeyScan extends Iterator {
 
+	private HeapFile hf;
+	private HashIndex hi;
+	private SearchKey key;
+	
   /**
    * Constructs an index scan, given the hash index and schema.
    */
   public KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file) {
-    throw new UnsupportedOperationException("Not implemented");
+    this.schema = schema;
+	this.hf = file;
+	this.hi = index;
+	this.key = key;
   }
 
   /**
@@ -21,7 +28,7 @@ public class KeyScan extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-    throw new UnsupportedOperationException("Not implemented");
+	System.out.println("KeyScan! depth: " + depth);
   }
 
   /**
