@@ -10,7 +10,6 @@ public class Selection extends Iterator {
 	private Iterator iter;
 	private Predicate[] preds;
 	private Tuple currTuple = null;
-	int pos;
 	int depth;
 
   /**
@@ -19,7 +18,6 @@ public class Selection extends Iterator {
   public Selection(Iterator iter, Predicate... preds) {
     this.iter=iter;
     this.preds=preds;
-    this.pos=0;
   }
 
   /**
@@ -27,14 +25,17 @@ public class Selection extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-    throw new UnsupportedOperationException("Not implemented");
+    if(hasNext()){
+    	System.out.println("Selection- Depth: " + depth);
+    	explain(depth + 1);
+    }
   }
 
   /**
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
-  	pos=0;
+  	currTuple = null;
 	iter.restart();
   }
 
@@ -63,11 +64,11 @@ public class Selection extends Iterator {
   
     else{
     	currTuple = iter.getNext();
-    	increment();
-    	if(preds[pos].evaluate(currTuple))
-    		return true;
-    	else
-    		return hasNext();
+    	for(int i = 0; i < preds.length; i++){
+    		if(preds[i].evaluate(currTuple))
+    			return true;
+    	}
+    	return hasNext();
     }
   }
 
@@ -77,23 +78,7 @@ public class Selection extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-  	if(!hasNext())
-		throw new IllegalStateException("No more Tuples");
-  
-    else{
-    	currTuple = iter.getNext();
-    	increment();
-    	if(preds[pos].evaluate(currTuple))
-    		return currTuple;
-    	else
-    		return getNext();
-    }
-  }
-  
-  public void increment(){
-  	if(pos != 0){
-  		pos++;
-  	}
+    return currTuple;
   }
 
 } // public class Selection extends Iterator
