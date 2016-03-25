@@ -10,6 +10,7 @@ public class Selection extends Iterator {
 	private Iterator iter;
 	private Predicate[] preds;
 	private Tuple currTuple = null;
+	private Schema schema;
 
   /**
    * Constructs a selection, given the underlying iterator and predicates.
