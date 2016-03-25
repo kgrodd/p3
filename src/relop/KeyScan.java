@@ -1,5 +1,6 @@
 package relop;
 
+import global.RID;
 import global.SearchKey;
 import heap.HeapFile;
 import index.HashIndex;
@@ -71,10 +72,12 @@ public class KeyScan extends Iterator {
    * 
    * @throws IllegalStateException if no more tuples
    */
-  public Tuple getNext() {
-	if(!this.hasNext())
-		throw new IllegalStateException("No more Tuples");    
-	return (new Tuple(this.schema, this.hf.selectRecord(this.hs.getNext())));
+  public Tuple getNext() {	
+	RID r = this.hs.getNext();
+	if(r == null)
+		throw new IllegalStateException("Out of tuples"); 
+
+	return (new Tuple(this.schema, this.hf.selectRecord(r)));
   }
 
 } // public class KeyScan extends Iterator
