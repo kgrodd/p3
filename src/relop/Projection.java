@@ -7,7 +7,7 @@ package relop;
 public class Projection extends Iterator {
 	private Iterator iter;
 	private Integer[] fields;
-	private Schema schema; 
+	private int fldcnt;
 	
   /**
    * Constructs a projection, given the underlying iterator and field numbers.
@@ -15,8 +15,9 @@ public class Projection extends Iterator {
   public Projection(Iterator iter, Integer... fields) {
     this.iter=iter;
     this.fields=fields;
-	Schema s = new Schema(fields.length);
-    for(int i = 0; i < fields.length; i++){
+    this.fldcnt=fields.length;
+	Schema s = new Schema(fldcnt);
+    for(int i = 0; i < fldcnt; i++){
     	
 	}
 	this.schema=s;
