@@ -17,10 +17,10 @@ public class Projection extends Iterator {
     this.fields=fields;
     this.fldcnt=fields.length;
 	this.schema=new Schema(fldcnt);
+	int j; //srcno
 	for(int i = 0; i < fldcnt; i++){
-		if(fields[i] == i){
-			schema.initField(i, iter.schema.fieldType(i), iter.schema.fieldLength(i), iter.schema.fieldName(i));
-		}
+		j = fields[i];
+		schema.initField(i, iter.schema.fieldType(j), iter.schema.fieldLength(j), iter.schema.fieldName(j));
 	}
   }
 
@@ -69,9 +69,12 @@ public class Projection extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    //Tuple next = itter.getNext();
-    //Tuple format = 
-  	return iter.getNext();
+    Tuple next = iter.getNext();
+    Tuple newTuple = new Tuple(schema);
+    for(int i = 0; i < fldcnt; i++){
+    	newTuple.setField(i, next.getField(fields[i]));
+    }
+  	return newTuple;
   }
 
 } // public class Projection extends Iterator
