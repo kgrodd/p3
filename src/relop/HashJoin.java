@@ -4,31 +4,42 @@ package relop;
  * Hash join: references on 462-463
  */
 public class HashJoin extends Iterator {
-	private Iterator outer;
-	private Iterator inner;
-	private Predicate[] preds;
-	
-	private boolean startJoin = true;
-	Tuple leftTuple;
-	
-	// boolean variable to indicate whether the pre-fetched tuple is consumed or not
-	private boolean nextTupleIsConsumed;
-	
-	// pre-fetched tuple
-	private Tuple nextTuple; 
+
+	private IndexScan left;
+	private IndexScan right;
+	private int leftCol;
+	private int rightCol;
+	private HashTableDup hashTable;
 
 	/**
 	 * Constructs a join, given the left and right iterators and join predicates
 	 * (relative to the combined schema).
 	 */
-	public HashJoin(Iterator left, Iterator right, int A, int B) {
-
-		this.outer = left;
-		this.inner = right;
-
-		this.schema = Schema.join(left.schema, right.schema);
+	public HashJoin(Iterator left, Iterator right, int leftCol, int rightCol) {
 		
-		nextTupleIsConsumed = true;
+		if(left instanceof FileScan){
+		
+		}
+
+		if(left instanceof KeyScan){
+		
+		}
+		
+		if(left instanceof IndexScan){
+		
+		}
+		
+		if(right instanceof FileScan){
+		
+		}
+
+		if(right instanceof KeyScan){
+		
+		}
+		
+		if(right instanceof IndexScan){
+		
+		}
 	}
 
 	/**
@@ -44,9 +55,8 @@ public class HashJoin extends Iterator {
 	 * Restarts the iterator, i.e. as if it were just constructed.
 	 */
 	public void restart() {
-
-		outer.restart();
-		nextTupleIsConsumed = true;
+		left.restart();
+		right.restart();
 	}
 
 	/**
@@ -54,7 +64,7 @@ public class HashJoin extends Iterator {
 	 */
 	public boolean isOpen() {
 		
-		if (outer.isOpen())
+		if (right.isOpen())
 			return true;
 
 		return false;
@@ -65,8 +75,8 @@ public class HashJoin extends Iterator {
 	 */
 	public void close() {
 
-		outer.close();
-		inner.close();
+		right.close();
+		left.close();
 	}
 
 	/**
@@ -74,43 +84,7 @@ public class HashJoin extends Iterator {
 	 * 
 	 */
 	public boolean hasNext() {
-
-		if (!nextTupleIsConsumed)
-			return true;
-		
-		if (!outer.hasNext())
-		//if(!inner.hasNext() && !outer.hasNext()) // correction of a bug
-			return false;
-
-		Tuple rightTuple;
-		
-		if (startJoin) {
-			leftTuple = outer.getNext();
-			startJoin = false;
-		}
-
-		while (true) {
-
-			while (inner.hasNext()) {
-				
-				rightTuple = inner.getNext();
-
-				// try to match
-				nextTuple = Tuple.join(leftTuple, rightTuple, this.schema);
-				for (int i = 0; i < preds.length; i++)
-					if (preds[i].evaluate(nextTuple)) {
-						nextTupleIsConsumed = false;
-						return true;
-					}
-			}
-
-			if (outer.hasNext()) {
-				leftTuple = outer.getNext();
-				inner.restart();
-			}
-			else
-				return false;
-		}
+		throw new UnsupportedOperationException("Not implemented");
 	}
 
 	/**
@@ -120,8 +94,7 @@ public class HashJoin extends Iterator {
 	 */
 	public Tuple getNext() {
 		
-		nextTupleIsConsumed = true;
-		return nextTuple;
+		throw new UnsupportedOperationException("Not implemented");
 	}
 	
 }
