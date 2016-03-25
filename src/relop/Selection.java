@@ -16,7 +16,7 @@ public class Selection extends Iterator {
    * Constructs a selection, given the underlying iterator and predicates.
    */
   public Selection(Iterator iter, Predicate... preds) {
-  	this.shema = iter.schema;
+  	this.schema = iter.schema;
     this.iter=iter;
     this.preds=preds;
   }

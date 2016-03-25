@@ -15,7 +15,7 @@ public class Projection extends Iterator {
   public Projection(Iterator iter, Integer... fields) {
     this.iter=iter;
     this.fields=fields;
-	Schema s = new s(fields.length);
+	Schema s = new Schema(fields.length);
     for(int i = 0; i < fields.length; i++){
     	
 	}
@@ -67,7 +67,7 @@ public class Projection extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    
+    return iter.getNext();
   }
 
 } // public class Projection extends Iterator
