@@ -11,7 +11,7 @@ import heap.HeapScan;
 public class FileScan extends Iterator {
 	private HeapFile hf = null;
 	private HeapScan hs = null;
-	private RID currRID = null;
+	private RID currRID = new RID();
 	private Tuple currTuple = null;
 
   /**
@@ -70,9 +70,12 @@ public class FileScan extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-	if(!this.hasNext())
-		throw new IllegalStateException("No more Tuples");
-	return (this.currTuple = new Tuple(this.schema, this.hs.getNext(this.currRID)));
+	byte [] arr = this.hs.getNext(this.currRID);
+	if(arr == null)
+		throw new IllegalStateException("Out of tuples");
+	this.currTuple = new Tuple(this.schema, arr);
+
+	return (this.currTuple);
   }
 
   /**
