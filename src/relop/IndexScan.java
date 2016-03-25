@@ -3,14 +3,15 @@ package relop;
 import global.SearchKey;
 import heap.HeapFile;
 import index.HashIndex;
-
+import index.BucketScan;
 /**
  * Wrapper for bucket scan, an index access method.
  */
 public class IndexScan extends Iterator {
-	private HeapFile hf;
-	private HashIndex hi;
-
+	private HeapFile hf = null;
+	private HashIndex hi = null;
+	private BucketScan bs = null;
+	private SearchKey sk = null;
 
   /**
    * Constructs an index scan, given the hash index and schema.
@@ -19,6 +20,7 @@ public class IndexScan extends Iterator {
   	this.schema = schema;
 	this.hf = file;
 	this.hi = index;
+	this.bs = this.hi.openScan();
   }
 
   /**
@@ -34,28 +36,31 @@ public class IndexScan extends Iterator {
    * Restarts the iterator, i.e. as if it were just constructed.
    */
   public void restart() {
-    throw new UnsupportedOperationException("Not implemented");
+    if(this.isOpen())
+		this.close();
+	this.bs = this.hi.openScan();
   }
 
   /**
    * Returns true if the iterator is open; false otherwise.
    */
   public boolean isOpen() {
-    throw new UnsupportedOperationException("Not implemented");
+	return (this.bs != null ? true : false);
   }
 
   /**
    * Closes the iterator, releasing any resources (i.e. pinned pages).
    */
   public void close() {
-    throw new UnsupportedOperationException("Not implemented");
+  	this.bs.close();
+	this.bs = null;
   }
 
   /**
    * Returns true if there are more tuples, false otherwise.
    */
   public boolean hasNext() {
-    throw new UnsupportedOperationException("Not implemented");
+    return this.bs.hasNext();
   }
 
   /**
@@ -64,14 +69,16 @@ public class IndexScan extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    throw new UnsupportedOperationException("Not implemented");
+    if(!this.hasNext())
+		throw new IllegalStateException("No more Tuples");    
+	return (new Tuple(this.schema, this.hf.selectRecord(this.bs.getNext())));
   }
 
   /**
    * Gets the key of the last tuple returned.
    */
   public SearchKey getLastKey() {
-    throw new UnsupportedOperationException("Not implemented");
+    return this.bs.getLastKey();
   }
 
   /**
@@ -79,7 +86,7 @@ public class IndexScan extends Iterator {
    * number of buckets if none.
    */
   public int getNextHash() {
-    throw new UnsupportedOperationException("Not implemented");
+    return this.bs.getNextHash();
   }
 
 } // public class IndexScan extends Iterator
