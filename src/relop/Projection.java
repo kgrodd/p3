@@ -7,14 +7,19 @@ package relop;
 public class Projection extends Iterator {
 	private Iterator iter;
 	private Integer[] fields;
-	private Tuple currTuple = null;
-	int depth;
+	private Schema schema; 
+	
   /**
    * Constructs a projection, given the underlying iterator and field numbers.
    */
   public Projection(Iterator iter, Integer... fields) {
     this.iter=iter;
     this.fields=fields;
+	Schema s = new s(fields.length);
+    for(int i = 0; i < fields.length; i++){
+    	
+	}
+	this.schema=s;
   }
 
   /**
@@ -22,7 +27,8 @@ public class Projection extends Iterator {
    * child iterators, and increases the indent depth along the way.
    */
   public void explain(int depth) {
-    throw new UnsupportedOperationException("Not implemented");
+    System.out.println("Projectinon - Depth: " + depth);
+    iter.explain(depth + 1);
   }
 
   /**
@@ -52,7 +58,7 @@ public class Projection extends Iterator {
    * Returns true if there are more tuples, false otherwise.
    */
   public boolean hasNext() {
-    throw new UnsupportedOperationException("Not implemented");
+    return iter.hasNext();
   }
 
   /**
@@ -61,7 +67,7 @@ public class Projection extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    throw new UnsupportedOperationException("Not implemented");
+    
   }
 
 } // public class Projection extends Iterator

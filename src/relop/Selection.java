@@ -10,12 +10,12 @@ public class Selection extends Iterator {
 	private Iterator iter;
 	private Predicate[] preds;
 	private Tuple currTuple = null;
-	int depth;
 
   /**
    * Constructs a selection, given the underlying iterator and predicates.
    */
   public Selection(Iterator iter, Predicate... preds) {
+  	this.shema = iter.schema;
     this.iter=iter;
     this.preds=preds;
   }
@@ -26,7 +26,7 @@ public class Selection extends Iterator {
    */
   public void explain(int depth) {
     	System.out.println("Selection- Depth: " + depth);
-    	explain(depth + 1);
+    	iter.explain(depth + 1);
   }
 
   /**
