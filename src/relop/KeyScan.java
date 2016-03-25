@@ -9,10 +9,10 @@ import index.HashScan;
  */
 public class KeyScan extends Iterator {
 
-	private HeapFile hf;
-	private HashIndex hi;
-	private SearchKey key;
-	private HashScan hs;
+	private HeapFile hf = null;
+	private HashIndex hi = null;
+	private SearchKey key = null;
+	private HashScan hs = null;
 
   /**
    * Constructs an index scan, given the hash index and schema.
@@ -48,21 +48,22 @@ public class KeyScan extends Iterator {
    * Returns true if the iterator is open; false otherwise.
    */
   public boolean isOpen() {
-    return (this.hi != null ? true : false);
+    return (this.hs != null ? true : false);
   }
 
   /**
    * Closes the iterator, releasing any resources (i.e. pinned pages).
    */
   public void close() {
-    throw new UnsupportedOperationException("Not implemented");
+    this.hs.close();
+	this.hs = null;
   }
 
   /**
    * Returns true if there are more tuples, false otherwise.
    */
   public boolean hasNext() {
-    throw new UnsupportedOperationException("Not implemented");
+    return this.hs.hasNext();
   }
 
   /**
@@ -71,7 +72,9 @@ public class KeyScan extends Iterator {
    * @throws IllegalStateException if no more tuples
    */
   public Tuple getNext() {
-    throw new UnsupportedOperationException("Not implemented");
+	if(!this.hasNext())
+		throw new IllegalStateException("No more Tuples");    
+	return (new Tuple(this.schema, this.hf.selectRecord(this.hs.getNext())));
   }
 
 } // public class KeyScan extends Iterator
