@@ -79,5 +79,13 @@ public class KeyScan extends Iterator {
 
 	return (new Tuple(this.schema, this.hf.selectRecord(r)));
   }
+  
+  public HeapFile getHeapFile(){
+  	return this.hf;
+  }
+  
+  public HashIndex getHashIndex(){
+  	return this.hi;
+  }
 
 } // public class KeyScan extends Iterator

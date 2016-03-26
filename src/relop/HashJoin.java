@@ -12,8 +12,12 @@ public class HashJoin extends Iterator {
 	private HashTableDup hashTable;
 
 	/**
-	 * Constructs a join, given the left and right iterators and join predicates
-	 * (relative to the combined schema).
+	 * 	Constructs a join, given the left and right iterators and what columns to check join on
+	 *
+	 *	Other scan formats for reference
+	 *  IndexScan(Schema schema, HashIndex index, HeapFile file)
+	 *	FileScan(Schema schema, HeapFile file)
+	 *	KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file)
 	 */
 	public HashJoin(Iterator left, Iterator right, int leftCol, int rightCol) {
 		
@@ -21,24 +25,24 @@ public class HashJoin extends Iterator {
 		
 		}
 
-		if(left instanceof KeyScan){
+		else if(left instanceof KeyScan){
 		
 		}
 		
-		if(left instanceof IndexScan){
-		
+		else if(left instanceof IndexScan){
+			this.left = (IndexScan)left;
 		}
 		
 		if(right instanceof FileScan){
 		
 		}
 
-		if(right instanceof KeyScan){
+		else if(right instanceof KeyScan){
 		
 		}
 		
-		if(right instanceof IndexScan){
-		
+		else if(right instanceof IndexScan){
+			this.right = (IndexScan)right;
 		}
 	}
 
