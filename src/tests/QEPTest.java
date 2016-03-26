@@ -170,13 +170,13 @@ public class QEPTest extends TestDriver {
 			saveCounts("both");
 
 			// that's all folks!
-			System.out.print("\n\nTest 1 completed without exception.");
+			System.out.print("\n\nTest 2 completed without exception.");
 			return PASS;
 
 		} catch (Exception exc) {
 
 			exc.printStackTrace(System.out);
-			System.out.print("\n\nTest 1 terminated because of exception.");
+			System.out.print("\n\nTest 2 terminated because of exception.");
 			return FAIL;
 
 		} finally {
@@ -207,13 +207,13 @@ public class QEPTest extends TestDriver {
 			saveCounts("join");
 
 			// that's all folks!
-			System.out.print("\n\nTest 1 completed without exception.");
+			System.out.print("\n\nTest 3 completed without exception.");
 			return PASS;
 
 		} catch (Exception exc) {
 
 			exc.printStackTrace(System.out);
-			System.out.print("\n\nTest 1 terminated because of exception.");
+			System.out.print("\n\nTest 3 terminated because of exception.");
 			return FAIL;
 
 		} finally {
@@ -246,13 +246,13 @@ public class QEPTest extends TestDriver {
 			saveCounts("test4");
 
 			// that's all folks!
-			System.out.print("\n\nTest 1 completed without exception.");
+			System.out.print("\n\nTest 4 completed without exception.");
 			return PASS;
 
 		} catch (Exception exc) {
 
 			exc.printStackTrace(System.out);
-			System.out.print("\n\nTest 1 terminated because of exception.");
+			System.out.print("\n\nTest 4 terminated because of exception.");
 			return FAIL;
 
 		} finally {
