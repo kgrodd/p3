@@ -1,5 +1,7 @@
 package relop;
 
+import index.HashIndex;
+
 /**
  * Hash join: references on 462-463
  */
@@ -19,30 +21,32 @@ public class HashJoin extends Iterator {
 	 *	FileScan(Schema schema, HeapFile file)
 	 *	KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file)
 	 */
-	public HashJoin(Iterator left, Iterator right, int leftCol, int rightCol) {
+	public HashJoin(Iterator l, Iterator r, int leftCol, int rightCol) {
 		
-		if(left instanceof FileScan){
+		if(l instanceof FileScan){
+			HashIndex tempHash = new HashIndex(null);
+			HeapFile tempHeap = l.getHeapFile();
+			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
+		}
+
+		else if(l instanceof KeyScan){
+		
+		}
+		
+		else if(l instanceof IndexScan){
+			this.left = (IndexScan)l;
+		}
+		
+		if(r instanceof FileScan){
 		
 		}
 
-		else if(left instanceof KeyScan){
+		else if(r instanceof KeyScan){
 		
 		}
 		
-		else if(left instanceof IndexScan){
-			this.left = (IndexScan)left;
-		}
-		
-		if(right instanceof FileScan){
-		
-		}
-
-		else if(right instanceof KeyScan){
-		
-		}
-		
-		else if(right instanceof IndexScan){
-			this.right = (IndexScan)right;
+		else if(r instanceof IndexScan){
+			this.right = (IndexScan)r;
 		}
 	}
 
