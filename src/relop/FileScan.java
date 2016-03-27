@@ -85,12 +85,5 @@ public class FileScan extends Iterator {
     return this.currRID;
   }
   
-  /*
-  	Gets the HeapFile for conversoin to index scan
-  */
-  public HeapFile getHeapFile(){
-  	return this.hf;
-  }
-  
 
 } // public class FileScan extends Iterator

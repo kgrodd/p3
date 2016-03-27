@@ -10,6 +10,15 @@ public class Selection extends Iterator {
 	private Iterator iter;
 	private Predicate[] preds;
 	private Tuple currTuple = null;
+	
+	private boolean startJoin = true;
+	Tuple leftTuple;
+	
+	// boolean variable to indicate whether the pre-fetched tuple is consumed or not
+	private boolean nextTupleIsConsumed;
+	
+	// pre-fetched tuple
+	private Tuple nextTuple; 
 
   /**
    * Constructs a selection, given the underlying iterator and predicates.

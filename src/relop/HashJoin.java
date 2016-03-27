@@ -1,6 +1,8 @@
 package relop;
 
 import index.HashIndex;
+import heap.HeapFile;
+import global.SearchKey;
 
 /**
  * Hash join: references on 462-463
@@ -11,7 +13,6 @@ public class HashJoin extends Iterator {
 	private IndexScan right;
 	private int leftCol;
 	private int rightCol;
-	private HashTableDup hashTable;
 
 	/**
 	 * 	Constructs a join, given the left and right iterators and what columns to check join on
@@ -22,15 +23,25 @@ public class HashJoin extends Iterator {
 	 *	KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file)
 	 */
 	public HashJoin(Iterator l, Iterator r, int leftCol, int rightCol) {
+		/*
+		this.leftCol = leftCol;
+		this.rightCol = rightCol;
+		this.schema = Schema.join(left.schema, right.schema);
 		
 		if(l instanceof FileScan){
-			HashIndex tempHash = new HashIndex(null);
-			HeapFile tempHeap = l.getHeapFile();
+			FileScan tempFileScan = (FileScan)l;
+			HeapFile tempHeap = tempFileScan.getHeapFile();
+			HashIndex tempHash = new HashIndex(tempFileScan.toString());
 			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
+			this.left = tempScan;
 		}
 
 		else if(l instanceof KeyScan){
-		
+			KeyScan tempKeyScan = (KeyScan)l;
+			HashIndex tempHash = tempKeyScan.getHashIndex();
+			HeapFile tempHeap = tempKeyScan.getHeapFile();
+			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
+			this.left = tempScan;
 		}
 		
 		else if(l instanceof IndexScan){
@@ -38,16 +49,26 @@ public class HashJoin extends Iterator {
 		}
 		
 		if(r instanceof FileScan){
-		
+			FileScan tempFileScan = (FileScan)r;
+			HashIndex tempHash = new HashIndex(null);
+			HeapFile tempHeap = tempFileScan.getHeapFile();
+			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
+			this.right = tempScan;
 		}
 
 		else if(r instanceof KeyScan){
-		
+			KeyScan tempKeyScan = (KeyScan)r;
+			HashIndex tempHash = tempKeyScan.getHashIndex();
+			HeapFile tempHeap = tempKeyScan.getHeapFile();
+			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
+			this.right = tempScan;	
 		}
 		
 		else if(r instanceof IndexScan){
 			this.right = (IndexScan)r;
 		}
+		
+		*/
 	}
 
 	/**
@@ -72,7 +93,7 @@ public class HashJoin extends Iterator {
 	 */
 	public boolean isOpen() {
 		
-		if (right.isOpen())
+		if (left.isOpen())
 			return true;
 
 		return false;
@@ -92,7 +113,32 @@ public class HashJoin extends Iterator {
 	 * 
 	 */
 	public boolean hasNext() {
-		throw new UnsupportedOperationException("Not implemented");
+		if(!left.hasNext())
+			return false; 
+		
+		int leftBucket = left.getNextHash();
+		int rightBucket;
+		Tuple leftTuple;
+		Tuple rightTuple;
+		SearchKey leftKey;
+		SearchKey rightKey;
+		
+		HashTableDup hashTable = new HashTableDup();
+		
+		while(true){
+			while(leftBucket == left.getNextHash()){
+				leftTuple = left.getNext();
+				leftKey = new SearchKey(leftTuple.getField(leftCol));
+				hashTable.add(leftKey,leftTuple);
+			}
+			while(left.getNextHash() == right.getNextHash()){
+				rightTuple = right.getNext();
+				
+			}
+			leftBucket = left.getNextHash();
+			rightBucket = right.getNextHash();
+			hashTable.clear();
+		}
 	}
 
 	/**
@@ -101,7 +147,6 @@ public class HashJoin extends Iterator {
 	 * @throws IllegalStateException if no more tuples
 	 */
 	public Tuple getNext() {
-		
 		throw new UnsupportedOperationException("Not implemented");
 	}
 	

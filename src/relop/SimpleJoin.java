@@ -40,8 +40,8 @@ public class SimpleJoin extends Iterator {
 	public void explain(int depth) {
 		this.indent(depth);
 		System.out.println("SimpleJoin!");
-		left.explain(depth+1);
-		right.explain(depth+1);
+		outer.explain(depth+1);
+		inner.explain(depth+1);
 	}
 
 	/**
