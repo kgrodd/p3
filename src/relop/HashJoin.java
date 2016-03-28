@@ -37,7 +37,36 @@ public class HashJoin extends Iterator {
 		HeapFile file = new HeapFile(null);
 		HashIndex index = new HashIndex(null);
 		
+		if(r instanceof IndexScan){
+			this.right = (IndexScan)r;
+
+		}
+		else{
+			Tuple tempTuple = new Tuple(schema);
+			while(r.hasNext()){
+				tempTuple = r.getNext();
+				RID rid = file.insertRecord(tempTuple.getData());
+				index.insertEntry(new SearchKey(tempTuple.getField(rightCol)), rid);
+			}
+			IndexScan indexScan = new IndexScan(schema, index, file);
+			this.right = indexScan;
+		}
 		
+		if(l instanceof IndexScan){
+			this.left = (IndexScan)l;
+		}
+		else{
+			Tuple tempTuple = new Tuple(schema);
+			while(l.hasNext()){
+				tempTuple = l.getNext();
+				RID rid = file.insertRecord(tempTuple.getData());
+				index.insertEntry(new SearchKey(tempTuple.getField(leftCol)), rid);
+			}
+			IndexScan indexScan = new IndexScan(schema, index, file);
+			this.left = indexScan;
+		}
+		
+		/*
 		if(l instanceof FileScan){
 			Tuple tempTuple = new Tuple(schema);
 			while(l.hasNext()){
@@ -74,7 +103,7 @@ public class HashJoin extends Iterator {
 		
 		else if(r instanceof IndexScan){
 			this.right = (IndexScan)r;
-		}
+		}*/
 		
 		this.schema = Schema.join(l.schema, r.schema);
 
