@@ -29,13 +29,14 @@ public class HashJoin extends Iterator {
 	 *	KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file)
 	 */
 	public HashJoin(Iterator l, Iterator r, int leftCol, int rightCol) {
-		
+		this.left = (IndexScan)l;
+		this.right = (IndexScan)r;
 		this.leftCol = leftCol;
 		this.rightCol = rightCol;
-		this.schema = Schema.join(left.schema, right.schema);
+		this.schema = Schema.join(l.schema, r.schema);
 		this.nextTuple = new Tuple(this.schema);
-		this.leftTuple = left.getNext();
-		this.rightTuple = right.getNext();
+
+
 		/*
 		
 		if(l instanceof FileScan){
@@ -88,7 +89,10 @@ public class HashJoin extends Iterator {
 	 */
 	public void explain(int depth) {
 		
-		throw new UnsupportedOperationException("Not implemented");
+		this.indent(depth);
+		System.out.println("HashJoin!");
+		left.explain(depth+1);
+		right.explain(depth+1);
 	}
 
 	/**
@@ -124,9 +128,12 @@ public class HashJoin extends Iterator {
 	 * 
 	 */
 	public boolean hasNext() {
-		if(!left.hasNext())
+		System.out.println("left.hasNext() ......." + left.hasNext());
+		if(!left.hasNext() || !right.hasNext())
 			return false; 
 		
+
+System.out.println("not empty!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		int leftBucket = left.getNextHash();
 		int rightBucket = right.getNextHash();
 		SearchKey leftKey;
@@ -139,18 +146,21 @@ public class HashJoin extends Iterator {
 		while(true){
 			while(leftBucket == left.getNextHash()){
 				leftTuple = left.getNext();
+				leftTuple.print();
 				leftKey = new SearchKey(leftTuple.getField(leftCol));
 				hashTable.add(leftKey,leftTuple);
 			}
 			while(leftBucket == rightBucket){
 				rightTuple = right.getNext();
+				leftTuple.print();
+				rightTuple.print();
 				rightKey = new SearchKey(rightTuple.getField(rightCol));
 				tupleArray = hashTable.getAll(rightKey);
 				rightBucket = right.getNextHash();
-				nextTuple = Tuple.join(leftTuple, tupleArray[position], this.schema);
 				if(tupleArray.length == 0){
-					return false;
+					continue;
 				}
+				nextTuple = Tuple.join(rightTuple, tupleArray[position], this.schema);
 				return true;
 			}
 			leftBucket = left.getNextHash();

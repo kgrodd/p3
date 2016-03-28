@@ -76,7 +76,7 @@ public class QEPTest extends TestDriver {
 		//Placeholders for getting data from employee table
 		String[] empArr = null;
 	 	Tuple empTuple = new Tuple(s_employee);
-		empHf = new HeapFile(null);
+		empHf = new HeapFile("Employees.txt");
 
 		while(empSc.hasNextLine()) {
 			empArr = empSc.nextLine().split(",");
@@ -87,7 +87,7 @@ public class QEPTest extends TestDriver {
 		//Placeholders for getting data from department table
 		String[] deptArr = null;
 	 	Tuple deptTuple = new Tuple(s_department);
-		deptHf = new HeapFile(null);
+		deptHf = new HeapFile("Department.txt");
 
 		while(deptSc.hasNextLine()) {
 			deptArr = deptSc.nextLine().split(",");
@@ -98,11 +98,11 @@ public class QEPTest extends TestDriver {
 		// run all the test cases
 		System.out.println("\n" + "Running " + TEST_NAME + "...");
 		boolean status = PASS;
-		status &= qep.test1();
-		status &= qep.test2();
-		status &= qep.test3();
+		//status &= qep.test1();
+		//status &= qep.test2();
+		//status &= qep.test3();
 		status &= qep.test4();
-
+		status &= qep.test5();
 		// display the final results
 		System.out.println();
 		if (status != PASS) {
@@ -233,6 +233,46 @@ public class QEPTest extends TestDriver {
 			saveCounts(null);
 			SimpleJoin join = new SimpleJoin(new FileScan(s_employee, empHf),
 					new FileScan(s_department, deptHf), new Predicate(AttrOperator.EQ, AttrType.FIELDNO, 4, AttrType.FIELDNO, 5));
+
+			Selection sel = new Selection(join, new Predicate(AttrOperator.GT, AttrType.FIELDNO, 3, AttrType.FIELDNO, 8));
+			Projection pro = new Projection(sel, 1);
+			pro.execute();
+
+			// destroy temp files before doing final counts
+			pro = null;
+			sel = null;
+			join = null;
+			System.gc();
+			saveCounts("test4");
+
+			// that's all folks!
+			System.out.print("\n\nTest 4 completed without exception.");
+			return PASS;
+
+		} catch (Exception exc) {
+
+			exc.printStackTrace(System.out);
+			System.out.print("\n\nTest 4 terminated because of exception.");
+			return FAIL;
+
+		} finally {
+			printSummary(2);
+			System.out.println();
+		}
+
+	}
+
+protected boolean test5() {
+		try {
+
+			System.out.println("\nTest 5:  Index scan test");
+			initCounts();
+		
+			// test selection onto projection
+			saveCounts(null);
+			System.out.println("FILE NAME!!!!!!!!!!!!!!!!: : " +  empHf.toString());
+			HashJoin join = new HashJoin(new IndexScan(s_employee, new HashIndex(empHf.toString()), empHf),
+					new IndexScan(s_department, new HashIndex(deptHf.toString()),deptHf), 4,5);
 
 			Selection sel = new Selection(join, new Predicate(AttrOperator.GT, AttrType.FIELDNO, 3, AttrType.FIELDNO, 8));
 			Projection pro = new Projection(sel, 1);
