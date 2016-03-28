@@ -29,57 +29,42 @@ public class HashJoin extends Iterator {
 	 *	KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file)
 	 */
 	public HashJoin(Iterator l, Iterator r, int leftCol, int rightCol) {
-		this.left = (IndexScan)l;
-		this.right = (IndexScan)r;
 		this.leftCol = leftCol;
 		this.rightCol = rightCol;
-		this.schema = Schema.join(l.schema, r.schema);
 		this.nextTuple = new Tuple(this.schema);
-
-
-		/*
 		
-		if(l instanceof FileScan){
-			FileScan tempFileScan = (FileScan)l;
-			HeapFile tempHeap = tempFileScan.getHeapFile();
-			HashIndex tempHash = new HashIndex(tempFileScan.toString());
-			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
-			this.left = tempScan;
-		}
-
-		else if(l instanceof KeyScan){
-			KeyScan tempKeyScan = (KeyScan)l;
-			HashIndex tempHash = tempKeyScan.getHashIndex();
-			HeapFile tempHeap = tempKeyScan.getHeapFile();
-			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
-			this.left = tempScan;
-		}
+		HeapFile file = new HeapFile(null);
+		HashIndex index = new HashIndex(null);
 		
-		else if(l instanceof IndexScan){
-			this.left = (IndexScan)l;
-		}
-		
-		if(r instanceof FileScan){
-			FileScan tempFileScan = (FileScan)r;
-			HashIndex tempHash = new HashIndex(null);
-			HeapFile tempHeap = tempFileScan.getHeapFile();
-			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
-			this.right = tempScan;
-		}
-
-		else if(r instanceof KeyScan){
-			KeyScan tempKeyScan = (KeyScan)r;
-			HashIndex tempHash = tempKeyScan.getHashIndex();
-			HeapFile tempHeap = tempKeyScan.getHeapFile();
-			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
-			this.right = tempScan;	
-		}
-		
-		else if(r instanceof IndexScan){
+		if(r instanceof IndexScan){
 			this.right = (IndexScan)r;
 		}
+		else{
+			Tuple tempTuple = new Tuple(schema);
+			while(r.hasNext()){
+				tempTuple = r.getNext();
+				RID rid = file.insertRecord(tempTuple.getData());
+				index.insertEntry(new SearchKey(tempTuple.getField(rightCol)), rid);
+			}
+			IndexScan indexScan = new IndexScan(schema, index, file);
+			this.right = indexScan;
+		}
 		
-		*/
+		if(l instanceof IndexScan){
+			this.left = (IndexScan)l;
+		}
+		else{
+			Tuple tempTuple = new Tuple(schema);
+			while(l.hasNext()){
+				tempTuple = l.getNext();
+				RID rid = file.insertRecord(tempTuple.getData());
+				index.insertEntry(new SearchKey(tempTuple.getField(leftCol)), rid);
+			}
+			IndexScan indexScan = new IndexScan(schema, index, file);
+			this.left = indexScan;
+		}
+		
+		this.schema = Schema.join(l.schema, r.schema);
 
 	}
 
@@ -128,12 +113,9 @@ public class HashJoin extends Iterator {
 	 * 
 	 */
 	public boolean hasNext() {
-		System.out.println("left.hasNext() ......." + left.hasNext());
 		if(!left.hasNext() || !right.hasNext())
 			return false; 
 		
-
-System.out.println("not empty!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		int leftBucket = left.getNextHash();
 		int rightBucket = right.getNextHash();
 		SearchKey leftKey;
@@ -145,19 +127,22 @@ System.out.println("not empty!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 		
 		while(true){
 			while(leftBucket == left.getNextHash()){
+				if(!left.hasNext())
+					break;
 				leftTuple = left.getNext();
-				leftTuple.print();
 				leftKey = new SearchKey(leftTuple.getField(leftCol));
 				hashTable.add(leftKey,leftTuple);
 			}
 			while(leftBucket == rightBucket){
+				if(!right.hasNext())
+					return false;
 				rightTuple = right.getNext();
 				leftTuple.print();
 				rightTuple.print();
 				rightKey = new SearchKey(rightTuple.getField(rightCol));
 				tupleArray = hashTable.getAll(rightKey);
 				rightBucket = right.getNextHash();
-				if(tupleArray.length == 0){
+				if(tupleArray  == null){
 					continue;
 				}
 				nextTuple = Tuple.join(rightTuple, tupleArray[position], this.schema);

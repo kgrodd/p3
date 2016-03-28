@@ -71,10 +71,10 @@ class ROTest extends TestDriver {
 		// run all the test cases
 		System.out.println("\n" + "Running " + TEST_NAME + "...");
 		boolean status = PASS;
-		status &= rot.test1();
-		status &= rot.test2();
-		status &= rot.test3();
-
+		//status &= rot.test1();
+		//status &= rot.test2();
+		//status &= rot.test3();
+		status &= rot.test4();
 		// display the final results
 		System.out.println();
 		if (status != PASS) {
@@ -369,6 +369,68 @@ class ROTest extends TestDriver {
 
 			exc.printStackTrace(System.out);
 			System.out.print("\n\nTest 3 terminated because of exception.");
+			return FAIL;
+
+		} finally {
+			printSummary(4);
+			System.out.println();
+		}
+	} // protected boolean test3()
+
+	protected boolean test4() {
+		try {
+
+			System.out.println("\nTest 4: The most complex query yet!\n");
+			initCounts();
+
+			// create and populate a temporary Drivers file and index
+			saveCounts(null);
+			Tuple tuple = new Tuple(s_drivers);
+			HeapFile drivers = new HeapFile(null);
+			HashIndex ixdrivers = new HashIndex(null);
+			for (int i = 0; i <= 3; i++) {
+
+				// create the tuple
+				tuple.setIntFld(0, i);
+				tuple.setStringFld(1, "f" + i);
+				tuple.setStringFld(2, "l" + i);
+				tuple.setFloatFld(3, (float) (i));
+				tuple.setIntFld(4, i);
+
+				// insert the tuple in the file and index
+				RID rid = drivers.insertRecord(tuple.getData());
+				ixdrivers.insertEntry(new SearchKey(i), rid);
+
+			} // for
+			saveCounts("drivers");
+
+
+			// hash join of hash join; selection for output's sake
+			saveCounts(null);
+			HashJoin join2 = new HashJoin(new IndexScan(s_drivers, ixdrivers,
+					drivers), new IndexScan(s_drivers, ixdrivers,
+					drivers), 2, 0);
+					Projection pro = new Projection(join2, 0,1,2,3,4);
+			pro.execute();
+
+			// destroy temp files before doing final counts
+			pro = null;
+			join2 = null;
+
+
+			ixdrivers = null;
+			drivers = null;
+			System.gc();
+			saveCounts("query");
+
+			// that's all folks!
+			System.out.print("\n\nTest 4 completed without exception.");
+			return PASS;
+
+		} catch (Exception exc) {
+
+			exc.printStackTrace(System.out);
+			System.out.print("\n\nTest 4 terminated because of exception.");
 			return FAIL;
 
 		} finally {
