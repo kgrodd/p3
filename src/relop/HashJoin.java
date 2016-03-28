@@ -3,6 +3,7 @@ package relop;
 import index.HashIndex;
 import heap.HeapFile;
 import global.SearchKey;
+import global.RID;
 
 /**
  * Hash join: references on 462-463
@@ -29,30 +30,27 @@ public class HashJoin extends Iterator {
 	 *	KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file)
 	 */
 	public HashJoin(Iterator l, Iterator r, int leftCol, int rightCol) {
-		this.left = (IndexScan)l;
-		this.right = (IndexScan)r;
 		this.leftCol = leftCol;
 		this.rightCol = rightCol;
-		this.schema = Schema.join(l.schema, r.schema);
 		this.nextTuple = new Tuple(this.schema);
-
-
-		/*
+		
+		HeapFile file = new HeapFile(null);
+		HashIndex index = new HashIndex(null);
+		
 		
 		if(l instanceof FileScan){
-			FileScan tempFileScan = (FileScan)l;
-			HeapFile tempHeap = tempFileScan.getHeapFile();
-			HashIndex tempHash = new HashIndex(tempFileScan.toString());
-			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
-			this.left = tempScan;
+			Tuple tempTuple = new Tuple(schema);
+			while(l.hasNext()){
+				tempTuple = l.getNext();
+				RID rid = file.insertRecord(tempTuple.getData());
+				index.insertEntry(new SearchKey(tempTuple.getField(leftCol)), rid);
+			}
+			IndexScan indexScan = new IndexScan(schema, index, file);
+			this.left = indexScan;
 		}
 
 		else if(l instanceof KeyScan){
-			KeyScan tempKeyScan = (KeyScan)l;
-			HashIndex tempHash = tempKeyScan.getHashIndex();
-			HeapFile tempHeap = tempKeyScan.getHeapFile();
-			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
-			this.left = tempScan;
+			
 		}
 		
 		else if(l instanceof IndexScan){
@@ -60,26 +58,25 @@ public class HashJoin extends Iterator {
 		}
 		
 		if(r instanceof FileScan){
-			FileScan tempFileScan = (FileScan)r;
-			HashIndex tempHash = new HashIndex(null);
-			HeapFile tempHeap = tempFileScan.getHeapFile();
-			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
-			this.right = tempScan;
+			Tuple tempTuple = new Tuple(schema);
+			while(l.hasNext()){
+				tempTuple = r.getNext();
+				RID rid = file.insertRecord(tempTuple.getData());
+				index.insertEntry(new SearchKey(tempTuple.getField(rightCol)), rid);
+			}
+			IndexScan indexScan = new IndexScan(schema, index, file);
+			this.left = indexScan;
 		}
 
 		else if(r instanceof KeyScan){
-			KeyScan tempKeyScan = (KeyScan)r;
-			HashIndex tempHash = tempKeyScan.getHashIndex();
-			HeapFile tempHeap = tempKeyScan.getHeapFile();
-			IndexScan tempScan = new IndexScan(schema, tempHash , tempHeap);
-			this.right = tempScan;	
+			
 		}
 		
 		else if(r instanceof IndexScan){
 			this.right = (IndexScan)r;
 		}
 		
-		*/
+		this.schema = Schema.join(l.schema, r.schema);
 
 	}
 
@@ -157,7 +154,7 @@ System.out.println("not empty!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 				rightKey = new SearchKey(rightTuple.getField(rightCol));
 				tupleArray = hashTable.getAll(rightKey);
 				rightBucket = right.getNextHash();
-				if(tupleArray.length == 0){
+				if(tupleArray == null){
 					continue;
 				}
 				nextTuple = Tuple.join(rightTuple, tupleArray[position], this.schema);
