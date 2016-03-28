@@ -86,4 +86,8 @@ public class FileScan extends Iterator {
   }
   
 
+  	public HeapFile getFile() {
+		return this.hf;
+	}
+
 } // public class FileScan extends Iterator

@@ -195,8 +195,10 @@ public class QEPTest extends TestDriver {
 			// test selection onto projection
 			saveCounts(null);
 
-			SimpleJoin join = new SimpleJoin(new FileScan(s_employee, empHf),
-					new FileScan(s_department, deptHf), new Predicate(AttrOperator.EQ, AttrType.FIELDNO, 4, AttrType.FIELDNO, 5));
+			//SimpleJoin join = new SimpleJoin(new FileScan(s_employee, empHf),
+			//		new FileScan(s_department, deptHf), new Predicate(AttrOperator.EQ, AttrType.FIELDNO, 4, AttrType.FIELDNO, 5));
+			HashJoin join = new HashJoin(new FileScan(s_employee, empHf),
+					new FileScan(s_department, deptHf),4,5);
 			Projection pro = new Projection(join,1,6,8);
 			pro.execute();
 
@@ -231,9 +233,10 @@ public class QEPTest extends TestDriver {
 		
 			// test selection onto projection
 			saveCounts(null);
-			SimpleJoin join = new SimpleJoin(new FileScan(s_employee, empHf),
-					new FileScan(s_department, deptHf), new Predicate(AttrOperator.EQ, AttrType.FIELDNO, 4, AttrType.FIELDNO, 5));
-
+			//SimpleJoin join = new SimpleJoin(new FileScan(s_employee, empHf),
+			//		new FileScan(s_department, deptHf), new Predicate(AttrOperator.EQ, AttrType.FIELDNO, 4, AttrType.FIELDNO, 5));
+			HashJoin join = new HashJoin(new FileScan(s_employee, empHf),
+					new FileScan(s_department, deptHf),4,5);
 			Selection sel = new Selection(join, new Predicate(AttrOperator.GT, AttrType.FIELDNO, 3, AttrType.FIELDNO, 8));
 			Projection pro = new Projection(sel, 1);
 			pro.execute();

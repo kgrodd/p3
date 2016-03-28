@@ -66,12 +66,10 @@ class HashTableDup extends Hashtable {
 			return new Tuple[] { (Tuple) match };
 
 		} else if (match instanceof Tuple[]) {
-
 			// return the matches
 			return (Tuple[]) match;
 
 		} else {
-
 			// convert ArrayList to Tuple[]
 			ArrayList<Tuple> a = (ArrayList<Tuple>) match;
 			return a.toArray(new Tuple[a.size()]);

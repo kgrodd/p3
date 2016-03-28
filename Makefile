@@ -15,7 +15,7 @@ compile:src/*/*.java
 
 xx : compile
 	$(JAVA) -cp $(CLASSPATH):bin tests.ROTest
-	$(JAVA) -cp $(CLASSPATH):bin tests.QEPTest src/tests/SampleData
+	$(JAVA) -cp $(CLASSPATH):bin tests.QEPTest src/tests/SampleData > out.txt
 
 	
 clean: 

@@ -123,7 +123,8 @@ public class SimpleJoin extends Iterator {
 	 * @throws IllegalStateException if no more tuples
 	 */
 	public Tuple getNext() {
-		
+		if(nextTuple == null)
+			throw new IllegalStateException("Out of tuples"); 
 		nextTupleIsConsumed = true;
 		return nextTuple;
 	}

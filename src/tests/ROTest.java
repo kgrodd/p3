@@ -73,8 +73,8 @@ class ROTest extends TestDriver {
 		boolean status = PASS;
 		//status &= rot.test1();
 		//status &= rot.test2();
-		//status &= rot.test3();
-		status &= rot.test4();
+		status &= rot.test3();
+		//status &= rot.test4();
 		// display the final results
 		System.out.println();
 		if (status != PASS) {
@@ -388,7 +388,7 @@ class ROTest extends TestDriver {
 			Tuple tuple = new Tuple(s_drivers);
 			HeapFile drivers = new HeapFile(null);
 			HashIndex ixdrivers = new HashIndex(null);
-			for (int i = 0; i <= 3; i++) {
+			for (int i = 0; i <= 9; i++) {
 
 				// create the tuple
 				tuple.setIntFld(0, i);
@@ -409,7 +409,7 @@ class ROTest extends TestDriver {
 			saveCounts(null);
 			HashJoin join2 = new HashJoin(new IndexScan(s_drivers, ixdrivers,
 					drivers), new IndexScan(s_drivers, ixdrivers,
-					drivers), 2, 0);
+					drivers), 0, 0);
 					Projection pro = new Projection(join2, 0,1,2,3,4);
 			pro.execute();
 
