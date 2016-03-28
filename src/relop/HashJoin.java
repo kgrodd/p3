@@ -13,6 +13,12 @@ public class HashJoin extends Iterator {
 	private IndexScan right;
 	private int leftCol;
 	private int rightCol;
+	int position = 0;
+	Tuple nextTuple;
+	Tuple leftTuple;
+	Tuple rightTuple;
+
+	
 
 	/**
 	 * 	Constructs a join, given the left and right iterators and what columns to check join on
@@ -23,10 +29,14 @@ public class HashJoin extends Iterator {
 	 *	KeyScan(Schema schema, HashIndex index, SearchKey key, HeapFile file)
 	 */
 	public HashJoin(Iterator l, Iterator r, int leftCol, int rightCol) {
-		/*
+		
 		this.leftCol = leftCol;
 		this.rightCol = rightCol;
 		this.schema = Schema.join(left.schema, right.schema);
+		this.nextTuple = new Tuple(this.schema);
+		this.leftTuple = left.getNext();
+		this.rightTuple = right.getNext();
+		/*
 		
 		if(l instanceof FileScan){
 			FileScan tempFileScan = (FileScan)l;
@@ -69,6 +79,7 @@ public class HashJoin extends Iterator {
 		}
 		
 		*/
+
 	}
 
 	/**
@@ -117,13 +128,13 @@ public class HashJoin extends Iterator {
 			return false; 
 		
 		int leftBucket = left.getNextHash();
-		int rightBucket;
-		Tuple leftTuple;
-		Tuple rightTuple;
+		int rightBucket = right.getNextHash();
 		SearchKey leftKey;
 		SearchKey rightKey;
+		Tuple [] tupleArray;
 		
 		HashTableDup hashTable = new HashTableDup();
+		
 		
 		while(true){
 			while(leftBucket == left.getNextHash()){
@@ -131,9 +142,16 @@ public class HashJoin extends Iterator {
 				leftKey = new SearchKey(leftTuple.getField(leftCol));
 				hashTable.add(leftKey,leftTuple);
 			}
-			while(left.getNextHash() == right.getNextHash()){
+			while(leftBucket == rightBucket){
 				rightTuple = right.getNext();
-				
+				rightKey = new SearchKey(rightTuple.getField(rightCol));
+				tupleArray = hashTable.getAll(rightKey);
+				rightBucket = right.getNextHash();
+				nextTuple = Tuple.join(leftTuple, tupleArray[position], this.schema);
+				if(tupleArray.length == 0){
+					return false;
+				}
+				return true;
 			}
 			leftBucket = left.getNextHash();
 			rightBucket = right.getNextHash();
@@ -147,7 +165,8 @@ public class HashJoin extends Iterator {
 	 * @throws IllegalStateException if no more tuples
 	 */
 	public Tuple getNext() {
-		throw new UnsupportedOperationException("Not implemented");
+		position++; 
+		return nextTuple;
 	}
 	
 }
