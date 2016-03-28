@@ -18,8 +18,9 @@ public class HashJoin extends Iterator {
 	Tuple nextTuple;
 	Tuple leftTuple;
 	Tuple rightTuple;
-
-	
+	Tuple [] rArray = null;
+	int leftHash = -1;
+	int rightHash = -1;
 
 	/**
 	 * 	Constructs a join, given the left and right iterators and what columns to check join on
@@ -32,6 +33,8 @@ public class HashJoin extends Iterator {
 	public HashJoin(Iterator l, Iterator r, int leftCol, int rightCol) {
 		this.leftCol = leftCol;
 		this.rightCol = rightCol;
+
+		this.schema = Schema.join(l.schema, r.schema);
 		this.nextTuple = new Tuple(this.schema);
 		
 		HeapFile file = new HeapFile(null);
@@ -39,73 +42,58 @@ public class HashJoin extends Iterator {
 		
 		if(r instanceof IndexScan){
 			this.right = (IndexScan)r;
-
 		}
-		else{
-			Tuple tempTuple = new Tuple(schema);
+		else if (r instanceof FileScan){
+			FileScan rfs = (FileScan)r;
+			Tuple tempTuple = new Tuple(r.getSchema());
+			while(rfs.hasNext()){
+				tempTuple = rfs.getNext();
+				RID rid = rfs.getLastRID();
+				index.insertEntry(new SearchKey(tempTuple.getField(rightCol)), rid);
+			}
+			IndexScan indexScan = new IndexScan(rfs.getSchema(), index, file);
+			this.right = indexScan;
+
+		}else{
+			Tuple tempTuple = new Tuple(r.getSchema());
 			while(r.hasNext()){
 				tempTuple = r.getNext();
 				RID rid = file.insertRecord(tempTuple.getData());
 				index.insertEntry(new SearchKey(tempTuple.getField(rightCol)), rid);
 			}
-			IndexScan indexScan = new IndexScan(schema, index, file);
+			IndexScan indexScan = new IndexScan(r.getSchema(), index, file);
 			this.right = indexScan;
 		}
-		
+
+		file = new HeapFile(null);
+		index = new HashIndex(null);
 		if(l instanceof IndexScan){
 			this.left = (IndexScan)l;
 		}
-		else{
-			Tuple tempTuple = new Tuple(schema);
+		else if (l instanceof FileScan){
+			FileScan lfs = (FileScan)l;
+			Tuple tempTuple = new Tuple(l.getSchema());
+			while(lfs.hasNext()){
+				tempTuple = lfs.getNext();
+				RID rid = lfs.getLastRID();
+				index.insertEntry(new SearchKey(tempTuple.getField(leftCol)), rid);
+			}
+			IndexScan indexScan = new IndexScan(l.getSchema(), index, file);
+			this.left = indexScan;
+
+		}else{
+			Tuple tempTuple = new Tuple(l.getSchema());
 			while(l.hasNext()){
 				tempTuple = l.getNext();
 				RID rid = file.insertRecord(tempTuple.getData());
 				index.insertEntry(new SearchKey(tempTuple.getField(leftCol)), rid);
 			}
-			IndexScan indexScan = new IndexScan(schema, index, file);
+			IndexScan indexScan = new IndexScan(l.getSchema(), index, file);
 			this.left = indexScan;
 		}
 		
-		/*
-		if(l instanceof FileScan){
-			Tuple tempTuple = new Tuple(schema);
-			while(l.hasNext()){
-				tempTuple = l.getNext();
-				RID rid = file.insertRecord(tempTuple.getData());
-				index.insertEntry(new SearchKey(tempTuple.getField(leftCol)), rid);
-			}
-			IndexScan indexScan = new IndexScan(schema, index, file);
-			this.left = indexScan;
-		}
+		
 
-		else if(l instanceof KeyScan){
-			
-		}
-		
-		else if(l instanceof IndexScan){
-			this.left = (IndexScan)l;
-		}
-		
-		if(r instanceof FileScan){
-			Tuple tempTuple = new Tuple(schema);
-			while(l.hasNext()){
-				tempTuple = r.getNext();
-				RID rid = file.insertRecord(tempTuple.getData());
-				index.insertEntry(new SearchKey(tempTuple.getField(rightCol)), rid);
-			}
-			IndexScan indexScan = new IndexScan(schema, index, file);
-			this.left = indexScan;
-		}
-
-		else if(r instanceof KeyScan){
-			
-		}
-		
-		else if(r instanceof IndexScan){
-			this.right = (IndexScan)r;
-		}*/
-		
-		this.schema = Schema.join(l.schema, r.schema);
 
 	}
 
@@ -154,45 +142,56 @@ public class HashJoin extends Iterator {
 	 * 
 	 */
 	public boolean hasNext() {
-		System.out.println("left.hasNext() ......." + left.hasNext());
-		if(!left.hasNext() || !right.hasNext())
-			return false; 
-		
+		if(!getHashesEqual()) {
+			return false;
+		}
 
-System.out.println("not empty!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-		int leftBucket = left.getNextHash();
-		int rightBucket = right.getNextHash();
-		SearchKey leftKey;
-		SearchKey rightKey;
-		Tuple [] tupleArray;
-		
 		HashTableDup hashTable = new HashTableDup();
-		
-		
-		while(true){
-			while(leftBucket == left.getNextHash()){
-				leftTuple = left.getNext();
-				leftTuple.print();
-				leftKey = new SearchKey(leftTuple.getField(leftCol));
-				hashTable.add(leftKey,leftTuple);
+
+		while(rArray == null || position == 0) {
+			SearchKey rightKey = new SearchKey(rightTuple.getField(rightCol));
+			hashTable.add(rightKey,rightTuple);
+
+			if(!right.hasNext() || right.getNextHash() != rightHash) {
+				rArray = hashTable.getAll(rightKey);			
+				break;
 			}
-			while(leftBucket == rightBucket){
-				rightTuple = right.getNext();
-				leftTuple.print();
-				rightTuple.print();
-				rightKey = new SearchKey(rightTuple.getField(rightCol));
-				tupleArray = hashTable.getAll(rightKey);
-				rightBucket = right.getNextHash();
-				if(tupleArray == null){
+
+			rightTuple = right.getNext();
+		}
+		//System.out.println("pos : " + position + "rar len : " + rArray.length);
+		//System.out.println("rhash : " + rightHash + " : lHash : " + leftHash);
+		for(;position < rArray.length;position++) {
+			nextTuple = Tuple.join(leftTuple, rArray[position] , this.schema);
+		}
+
+		if(position == rArray.length)
+			
+		nextTuple.print();
+		return true;
+	}
+
+
+	public boolean getHashesEqual() {
+		while(true) {
+			if(rightHash < leftHash || rightHash == -1) {
+				if(right.hasNext()) {
+					rightHash = right.getNextHash();
+					rightTuple = right.getNext();
 					continue;
 				}
-				nextTuple = Tuple.join(rightTuple, tupleArray[position], this.schema);
-				return true;
+				return false;
+			} else if (leftHash < rightHash || (rArray != null && position == rArray.length)) {
+				if(left.hasNext()) {
+					position = 0;
+					leftHash = left.getNextHash();
+					leftTuple = left.getNext();
+					continue;
+				}
+				return false;
 			}
-			leftBucket = left.getNextHash();
-			rightBucket = right.getNextHash();
-			hashTable.clear();
-		}
+			return true;
+		}	
 	}
 
 	/**
